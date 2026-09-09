@@ -8,8 +8,7 @@ from datetime import datetime
 CONFIG_DIR = Path("configs")
 CONFIG_DIR.mkdir(exist_ok=True)
 
-Colors
-
+# Colors
 R = "\033[91m"
 G = "\033[92m"
 C = "\033[96m"
@@ -20,9 +19,10 @@ W = "\033[97m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
+
 def banner():
-print("\033c", end="")
-print(f"""
+    print("\033c", end="")
+    print(f"""
 {C}{BOLD}╔══════════════════════════════════════════╗
 ║                                          ║
 ║        {Y}⚡ CONFIG MAKER ⚡{C}                 ║
@@ -33,230 +33,297 @@ print(f"""
 ╚══════════════════════════════════════════╝{RESET}
 """)
 
+
 def ask(text, default=""):
-if default:
-value = input(f"{C}{text}{W} [{default}]: {RESET}").strip()
-return value or default
-return input(f"{C}{text}: {RESET}").strip()
+    if default:
+        value = input(
+            f"{C}{text}{W} [{default}]: {RESET}"
+        ).strip()
+        return value or default
+
+    return input(f"{C}{text}: {RESET}").strip()
+
 
 def save_config(name, data, uri):
-safe = "".join(c for c in name if c.isalnum() or c in "-_ ").strip()
-if not safe:
-safe = "config"
-filename = CONFIG_DIR / f"{safe}.json"
+    safe = "".join(
+        c for c in name
+        if c.isalnum() or c in "-_ "
+    ).strip()
 
-data["_share_link"] = uri  
-data["_created_at"] = datetime.now().isoformat(timespec="seconds")  
+    if not safe:
+        safe = "config"
 
-filename.write_text(  
-    json.dumps(data, indent=2, ensure_ascii=False),  
-    encoding="utf-8"  
-)  
+    filename = CONFIG_DIR / f"{safe}.json"
 
-return filename
+    data["_share_link"] = uri
+    data["_created_at"] = datetime.now().isoformat(
+        timespec="seconds"
+    )
+
+    filename.write_text(
+        json.dumps(
+            data,
+            indent=2,
+            ensure_ascii=False
+        ),
+        encoding="utf-8"
+    )
+
+    return filename
+
 
 def transport():
-print(f"""
+    print(f"""
 {Y}1){W} TCP
 {Y}2){W} WebSocket
 {Y}3){W} gRPC
 """)
-choice = ask("Transport", "1")
 
-if choice == "2":  
-    return "ws"  
-if choice == "3":  
-    return "grpc"  
-return "tcp"
+    choice = ask("Transport", "1")
+
+    if choice == "2":
+        return "ws"
+
+    if choice == "3":
+        return "grpc"
+
+    return "tcp"
+
 
 def create_vless():
-print(f"\n{M}--- VLESS ---{RESET}")
+    print(f"\n{M}--- VLESS ---{RESET}")
 
-name = ask("Config name", "Sakraton-VLESS")  
-address = ask("Server address")  
-port = ask("Port", "443")  
-client_id = ask("UUID", str(uuid.uuid4()))  
+    name = ask("Config name", "Sakraton-VLESS")
+    address = ask("Server address")
+    port = ask("Port", "443")
+    client_id = ask("UUID", str(uuid.uuid4()))
 
-net = transport()  
-security = ask("Security", "tls")  
+    net = transport()
+    security = ask("Security", "tls")
 
-params = {  
-    "encryption": "none",  
-    "security": security,  
-    "type": net  
-}  
+    params = {
+        "encryption": "none",
+        "security": security,
+        "type": net
+    }
 
-sni = ""  
-host = ""  
-path = ""  
+    sni = ""
+    host = ""
+    path = ""
 
-if security == "tls":  
-    sni = ask("SNI", address)  
-    params["sni"] = sni  
+    if security == "tls":
+        sni = ask("SNI", address)
+        params["sni"] = sni
 
-if net == "ws":  
-    path = ask("WebSocket path", "/")  
-    host = ask("WebSocket Host", address)  
-    params["host"] = host  
-    params["path"] = path  
+    if net == "ws":
+        path = ask("WebSocket path", "/")
+        host = ask("WebSocket Host", address)
+        params["host"] = host
+        params["path"] = path
 
-elif net == "grpc":  
-    service = ask("gRPC service name", "grpc")  
-    params["serviceName"] = service  
+    elif net == "grpc":
+        service = ask("gRPC service name", "grpc")
+        params["serviceName"] = service
 
-query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)  
-uri = f"vless://{client_id}@{address}:{port}?{query}#{urllib.parse.quote(name)}"  
+    query = urllib.parse.urlencode(
+        params,
+        quote_via=urllib.parse.quote
+    )
 
-data = {  
-    "protocol": "vless",  
-    "name": name,  
-    "address": address,  
-    "port": int(port),  
-    "id": client_id,  
-    "network": net,  
-    "security": security  
-}  
+    uri = (
+        f"vless://{client_id}@{address}:{port}"
+        f"?{query}#{urllib.parse.quote(name)}"
+    )
 
-if sni:  
-    data["sni"] = sni  
-if host:  
-    data["host"] = host  
-if path:  
-    data["path"] = path  
+    data = {
+        "protocol": "vless",
+        "name": name,
+        "address": address,
+        "port": int(port),
+        "id": client_id,
+        "network": net,
+        "security": security
+    }
 
-file = save_config(name, data, uri)  
+    if sni:
+        data["sni"] = sni
 
-print(f"\n{G}✓ VLESS config created!{RESET}")  
-print(f"{Y}Share Link:{RESET}\n{W}{uri}{RESET}")  
-print(f"\n{C}Saved:{RESET} {file}")
+    if host:
+        data["host"] = host
+
+    if path:
+        data["path"] = path
+
+    file = save_config(name, data, uri)
+
+    print(f"\n{G}✓ VLESS config created!{RESET}")
+    print(f"{Y}Share Link:{RESET}")
+    print(f"{W}{uri}{RESET}")
+    print(f"\n{C}Saved:{RESET} {file}")
+
 
 def create_vmess():
-print(f"\n{M}--- VMESS ---{RESET}")
+    print(f"\n{M}--- VMESS ---{RESET}")
 
-name = ask("Config name", "Sakraton-VMESS")  
-address = ask("Server address")  
-port = ask("Port", "443")  
-client_id = ask("UUID", str(uuid.uuid4()))  
-net = transport()  
-tls = ask("TLS", "tls")  
+    name = ask("Config name", "Sakraton-VMESS")
+    address = ask("Server address")
+    port = ask("Port", "443")
+    client_id = ask("UUID", str(uuid.uuid4()))
 
-host = ""  
-path = ""  
+    net = transport()
+    tls = ask("TLS", "tls")
 
-if net == "ws":  
-    path = ask("WebSocket path", "/")  
-    host = ask("WebSocket Host", address)  
+    host = ""
+    path = ""
 
-vmess = {  
-    "v": "2",  
-    "ps": name,  
-    "add": address,  
-    "port": str(port),  
-    "id": client_id,  
-    "aid": "0",  
-    "scy": "auto",  
-    "net": net,  
-    "type": "none",  
-    "host": host,  
-    "path": path,  
-    "tls": tls  
-}  
+    if net == "ws":
+        path = ask("WebSocket path", "/")
+        host = ask("WebSocket Host", address)
 
-raw = json.dumps(vmess, separators=(",", ":"))  
-encoded = base64.b64encode(raw.encode()).decode()  
-uri = f"vmess://{encoded}"  
+    vmess = {
+        "v": "2",
+        "ps": name,
+        "add": address,
+        "port": str(port),
+        "id": client_id,
+        "aid": "0",
+        "scy": "auto",
+        "net": net,
+        "type": "none",
+        "host": host,
+        "path": path,
+        "tls": tls
+    }
 
-data = {  
-    "protocol": "vmess",  
-    "name": name,  
-    "config": vmess  
-}  
+    raw = json.dumps(
+        vmess,
+        separators=(",", ":")
+    )
 
-file = save_config(name, data, uri)  
+    encoded = base64.b64encode(
+        raw.encode()
+    ).decode()
 
-print(f"\n{G}✓ VMESS config created!{RESET}")  
-print(f"{Y}Share Link:{RESET}\n{W}{uri}{RESET}")  
-print(f"\n{C}Saved:{RESET} {file}")
+    uri = f"vmess://{encoded}"
+
+    data = {
+        "protocol": "vmess",
+        "name": name,
+        "config": vmess
+    }
+
+    file = save_config(name, data, uri)
+
+    print(f"\n{G}✓ VMESS config created!{RESET}")
+    print(f"{Y}Share Link:{RESET}")
+    print(f"{W}{uri}{RESET}")
+    print(f"\n{C}Saved:{RESET} {file}")
+
 
 def create_trojan():
-print(f"\n{M}--- TROJAN ---{RESET}")
+    print(f"\n{M}--- TROJAN ---{RESET}")
 
-name = ask("Config name", "Sakraton-Trojan")  
-address = ask("Server address")  
-port = ask("Port", "443")  
-password = ask("Password")  
-security = ask("Security", "tls")  
-net = transport()  
+    name = ask("Config name", "Sakraton-Trojan")
+    address = ask("Server address")
+    port = ask("Port", "443")
+    password = ask("Password")
+    security = ask("Security", "tls")
+    net = transport()
 
-params = {  
-    "security": security,  
-    "type": net  
-}  
+    params = {
+        "security": security,
+        "type": net
+    }
 
-if security == "tls":  
-    params["sni"] = ask("SNI", address)  
+    if security == "tls":
+        params["sni"] = ask("SNI", address)
 
-if net == "ws":  
-    params["host"] = ask("WebSocket Host", address)  
-    params["path"] = ask("WebSocket path", "/")  
+    if net == "ws":
+        params["host"] = ask(
+            "WebSocket Host",
+            address
+        )
+        params["path"] = ask(
+            "WebSocket path",
+            "/"
+        )
 
-elif net == "grpc":  
-    params["serviceName"] = ask("gRPC service name", "grpc")  
+    elif net == "grpc":
+        params["serviceName"] = ask(
+            "gRPC service name",
+            "grpc"
+        )
 
-query = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)  
-uri = f"trojan://{urllib.parse.quote(password)}@{address}:{port}?{query}#{urllib.parse.quote(name)}"  
+    query = urllib.parse.urlencode(
+        params,
+        quote_via=urllib.parse.quote
+    )
 
-data = {  
-    "protocol": "trojan",  
-    "name": name,  
-    "address": address,  
-    "port": int(port),  
-    "network": net,  
-    "security": security  
-}  
+    uri = (
+        f"trojan://{urllib.parse.quote(password)}"
+        f"@{address}:{port}?{query}"
+        f"#{urllib.parse.quote(name)}"
+    )
 
-file = save_config(name, data, uri)  
+    data = {
+        "protocol": "trojan",
+        "name": name,
+        "address": address,
+        "port": int(port),
+        "network": net,
+        "security": security
+    }
 
-print(f"\n{G}✓ Trojan config created!{RESET}")  
-print(f"{Y}Share Link:{RESET}\n{W}{uri}{RESET}")  
-print(f"\n{C}Saved:{RESET} {file}")
+    file = save_config(name, data, uri)
+
+    print(f"\n{G}✓ Trojan config created!{RESET}")
+    print(f"{Y}Share Link:{RESET}")
+    print(f"{W}{uri}{RESET}")
+    print(f"\n{C}Saved:{RESET} {file}")
+
 
 def list_configs():
-files = list(CONFIG_DIR.glob("*.json"))
+    files = list(CONFIG_DIR.glob("*.json"))
 
-if not files:  
-    print(f"\n{Y}No configs saved.{RESET}")  
-    return  
+    if not files:
+        print(f"\n{Y}No configs saved.{RESET}")
+        return
 
-print(f"\n{C}{BOLD}Saved Configs:{RESET}\n")  
+    print(f"\n{C}{BOLD}Saved Configs:{RESET}\n")
 
-for i, file in enumerate(files, 1):  
-    print(f"{G}{i}){W} {file.name}")
+    for i, file in enumerate(files, 1):
+        print(f"{G}{i}){W} {file.name}")
+
 
 def delete_config():
-files = list(CONFIG_DIR.glob("*.json"))
+    files = list(CONFIG_DIR.glob("*.json"))
 
-if not files:  
-    print(f"\n{Y}No configs to delete.{RESET}")  
-    return  
+    if not files:
+        print(f"\n{Y}No configs to delete.{RESET}")
+        return
 
-list_configs()  
+    list_configs()
 
-choice = ask("Select number")  
-try:  
-    index = int(choice) - 1  
-    file = files[index]  
-    file.unlink()  
-    print(f"{G}✓ Deleted: {file.name}{RESET}")  
-except (ValueError, IndexError):  
-    print(f"{R}Invalid selection.{RESET}")
+    choice = ask("Select number")
+
+    try:
+        index = int(choice) - 1
+        file = files[index]
+        file.unlink()
+
+        print(
+            f"{G}✓ Deleted: {file.name}{RESET}"
+        )
+
+    except (ValueError, IndexError):
+        print(f"{R}Invalid selection.{RESET}")
+
 
 def menu():
-while True:
-banner()
+    while True:
+        banner()
 
-print(f"""
-
+        print(f"""
 {G}1){W} Create VLESS
 {G}2){W} Create VMESS
 {G}3){W} Create Trojan
@@ -265,30 +332,51 @@ print(f"""
 {R}0){W} Exit
 """)
 
-choice = input(f"{Y}Sakraton@ConfigMaker > {W}").strip()  
+        choice = input(
+            f"{Y}Sakraton@ConfigMaker > {W}"
+        ).strip()
 
-    try:  
-        if choice == "1":  
-            create_vless()  
-        elif choice == "2":  
-            create_vmess()  
-        elif choice == "3":  
-            create_trojan()  
-        elif choice == "4":  
-            list_configs()  
-        elif choice == "5":  
-            delete_config()  
-        elif choice == "0":  
-            print(f"\n{G}Goodbye 👋{RESET}")  
-            break  
-        else:  
-            print(f"{R}Invalid option.{RESET}")  
-    except KeyboardInterrupt:  
-        print(f"\n{Y}Cancelled.{RESET}")  
-    except Exception as e:  
-        print(f"\n{R}Error: {e}{RESET}")  
+        try:
+            if choice == "1":
+                create_vless()
 
-    input(f"\n{C}Press Enter to continue...{RESET}")
+            elif choice == "2":
+                create_vmess()
 
-if name == "main":
-menu()
+            elif choice == "3":
+                create_trojan()
+
+            elif choice == "4":
+                list_configs()
+
+            elif choice == "5":
+                delete_config()
+
+            elif choice == "0":
+                print(
+                    f"\n{G}Goodbye 👋{RESET}"
+                )
+                break
+
+            else:
+                print(
+                    f"{R}Invalid option.{RESET}"
+                )
+
+        except KeyboardInterrupt:
+            print(
+                f"\n{Y}Cancelled.{RESET}"
+            )
+
+        except Exception as e:
+            print(
+                f"\n{R}Error: {e}{RESET}"
+            )
+
+        input(
+            f"\n{C}Press Enter to continue...{RESET}"
+        )
+
+
+if __name__ == "__main__":
+    menu()
