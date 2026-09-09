@@ -1,0 +1,20 @@
+{
+  "protocol": "vmess",
+  "name": "sakraton",
+  "config": {
+    "v": "2",
+    "ps": "sakraton",
+    "add": "216.106.183.35",
+    "port": "443",
+    "id": "4",
+    "aid": "0",
+    "scy": "auto",
+    "net": "tcp",
+    "type": "none",
+    "host": "",
+    "path": "",
+    "tls": "tĺs"
+  },
+  "_share_link": "vmess://eyJ2IjoiMiIsInBzIjoic2FrcmF0b24iLCJhZGQiOiIyMTYuMTA2LjE4My4zNSIsInBvcnQiOiI0NDMiLCJpZCI6IjQiLCJhaWQiOiIwIiwic2N5IjoiYXV0byIsIm5ldCI6InRjcCIsInR5cGUiOiJub25lIiwiaG9zdCI6IiIsInBhdGgiOiIiLCJ0bHMiOiJ0XHUwMTNhcyJ9",
+  "_created_at": "2026-09-07T01:40:34"
+}

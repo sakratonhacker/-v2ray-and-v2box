@@ -1,0 +1,12 @@
+{
+  "protocol": "vless",
+  "name": "mamad",
+  "address": "8080",
+  "port": 443,
+  "id": "4",
+  "network": "tcp",
+  "security": "tls",
+  "sni": "8080",
+  "_share_link": "vless://4@8080:443?encryption=none&security=tls&type=tcp&sni=8080#mamad",
+  "_created_at": "2026-09-07T01:34:20"
+}

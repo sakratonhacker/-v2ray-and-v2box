@@ -1,0 +1,20 @@
+{
+  "protocol": "vmess",
+  "name": "sajrwto",
+  "config": {
+    "v": "2",
+    "ps": "sajrwto",
+    "add": "http://127.0.0.1:8080",
+    "port": "8080",
+    "id": "4",
+    "aid": "0",
+    "scy": "auto",
+    "net": "ws",
+    "type": "none",
+    "host": "1",
+    "path": "/",
+    "tls": "tls"
+  },
+  "_share_link": "vmess://eyJ2IjoiMiIsInBzIjoic2Fqcnd0byIsImFkZCI6Imh0dHA6Ly8xMjcuMC4wLjE6ODA4MCIsInBvcnQiOiI4MDgwIiwiaWQiOiI0IiwiYWlkIjoiMCIsInNjeSI6ImF1dG8iLCJuZXQiOiJ3cyIsInR5cGUiOiJub25lIiwiaG9zdCI6IjEiLCJwYXRoIjoiLyIsInRscyI6InRscyJ9",
+  "_created_at": "2026-09-07T01:36:26"
+}
